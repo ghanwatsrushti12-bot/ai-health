@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{{ department.name }}{% endblock %}
+{% block content %}
+<section class="cp-section">
+    <div class="container">
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="cp-dept-icon" style="width:70px;height:70px;font-size:2rem;"><i class="bi {{ department.icon }}"></i></div>
+            <div>
+                <h1 class="mb-1">{{ department.name }}</h1>
+                <p class="text-muted mb-0">{{ department.description }}</p>
+            </div>
+        </div>
+        <h5 class="mb-3">Doctors in this department</h5>
+        <div class="row g-4">
+            {% for doctor in doctors %}
+            <div class="col-md-6 col-lg-4">
+                <div class="cp-card cp-doctor-card h-100">
+                    {% if doctor.photo %}
+                        <img src="{{ doctor.photo.url }}" class="cp-doctor-photo" alt="Dr. {{ doctor.full_name }}">
+                    {% else %}
+                        <div class="cp-doctor-photo-placeholder"><i class="bi bi-person-badge"></i></div>
+                    {% endif %}
+                    <div class="cp-card-body">
+                        <h6 class="mb-1">Dr. {{ doctor.full_name }}</h6>
+                        <div class="text-muted small mb-2">{{ doctor.designation }}</div>
+                        <a href="{{ doctor.get_absolute_url }}" class="btn cp-btn-outline btn-sm w-100">View profile</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="cp-empty-state"><i class="bi bi-person-x"></i>No doctors listed in this department yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

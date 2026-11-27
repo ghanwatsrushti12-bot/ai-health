@@ -1,0 +1,51 @@
+{% extends "dashboard/_dashboard_base.html" %}
+{% block page_title %}Welcome, Dr. {{ doctor.full_name }}{% endblock %}
+{% block page_subtitle %}<p class="text-muted mb-0">{{ doctor.department.name }} &middot; {{ doctor.designation }}</p>{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="cp-stat-card cp-animate-in">
+            <div class="cp-stat-icon cp-icon-bg-primary"><i class="bi bi-calendar2-day"></i></div>
+            <div><div class="cp-stat-value">{{ today_appointments|length }}</div><div class="cp-stat-label">Today's appointments</div></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="cp-stat-card cp-animate-in delay-1">
+            <div class="cp-stat-icon cp-icon-bg-accent"><i class="bi bi-calendar2-week"></i></div>
+            <div><div class="cp-stat-value">{{ upcoming_count }}</div><div class="cp-stat-label">Upcoming total</div></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="cp-stat-card cp-animate-in delay-2">
+            <div class="cp-stat-icon cp-icon-bg-success"><i class="bi bi-people"></i></div>
+            <div><div class="cp-stat-value">{{ total_patients }}</div><div class="cp-stat-label">Patients seen</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="cp-card cp-card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0">Today's schedule</h6>
+        <a href="{% url 'appointments:list' %}" class="small">View full schedule</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>Time</th><th>Patient</th><th>Reason</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+                {% for appt in today_appointments %}
+                <tr>
+                    <td>{{ appt.scheduled_time|time:"g:i A" }}</td>
+                    <td>{{ appt.patient.get_full_name|default:appt.patient.username }}</td>
+                    <td class="small">{{ appt.reason }}</td>
+                    <td><span class="badge {{ appt.status_badge_class }}">{{ appt.get_status_display }}</span></td>
+                    <td class="text-end"><a href="{% url 'appointments:detail' appt.pk %}" class="btn btn-sm cp-btn-outline">View</a></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5"><div class="cp-empty-state"><i class="bi bi-calendar-check"></i>No appointments scheduled for today.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

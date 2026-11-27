@@ -1,0 +1,12 @@
+{% extends "dashboard/_dashboard_base.html" %}
+{% block page_title %}Add Availability - Dr. {{ doctor.full_name }}{% endblock %}
+{% block dashboard_content %}
+<div class="cp-form-card" style="max-width: 520px;">
+    <form method="post">
+        {% csrf_token %}
+        {% include "includes/_form.html" with form=form %}
+        <button type="submit" class="btn cp-btn-primary px-4">Add slot</button>
+        <a href="{% url 'doctors:manage_detail' doctor.pk %}" class="btn cp-btn-outline px-4">Cancel</a>
+    </form>
+</div>
+{% endblock %}

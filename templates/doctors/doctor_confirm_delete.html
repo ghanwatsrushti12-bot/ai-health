@@ -1,0 +1,14 @@
+{% extends "dashboard/_dashboard_base.html" %}
+{% block page_title %}Remove Doctor{% endblock %}
+{% block dashboard_content %}
+<div class="cp-form-card text-center" style="max-width: 480px;">
+    <div class="cp-feature-icon mx-auto" style="background: #fdecec; color: var(--cp-danger);"><i class="bi bi-exclamation-triangle"></i></div>
+    <h5 class="mb-2">Remove Dr. {{ object.full_name }}?</h5>
+    <p class="text-muted small mb-4">This cannot be undone. Existing appointment history will be preserved.</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger w-100 mb-2">Yes, remove doctor</button>
+        <a href="{% url 'doctors:manage_list' %}" class="btn cp-btn-outline w-100">Cancel</a>
+    </form>
+</div>
+{% endblock %}

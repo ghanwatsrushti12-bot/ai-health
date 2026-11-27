@@ -1,0 +1,174 @@
+{% extends "dashboard/_dashboard_base.html" %}
+{% block page_title %}Operations Dashboard{% endblock %}
+{% block page_subtitle %}<p class="text-muted mb-0">Live snapshot across the hospital.</p>{% endblock %}
+{% block page_actions %}
+<a href="{% url 'doctors:manage_list' %}" class="btn cp-btn-outline btn-sm"><i class="bi bi-person-badge me-1"></i>Manage doctors</a>
+<a href="{% url 'ambulance:request_list' %}" class="btn cp-btn-primary btn-sm"><i class="bi bi-truck me-1"></i>Ambulance queue</a>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="cp-stat-card cp-animate-in">
+            <div class="cp-stat-icon cp-icon-bg-primary"><i class="bi bi-calendar2-week"></i></div>
+            <div><div class="cp-stat-value">{{ total_appointments }}</div><div class="cp-stat-label">Total appointments</div></div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="cp-stat-card cp-animate-in delay-1">
+            <div class="cp-stat-icon cp-icon-bg-accent"><i class="bi bi-calendar-check"></i></div>
+            <div><div class="cp-stat-value">{{ today_appointments }}</div><div class="cp-stat-label">Scheduled today</div></div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="cp-stat-card cp-animate-in delay-2">
+            <div class="cp-stat-icon cp-icon-bg-warning"><i class="bi bi-hourglass-split"></i></div>
+            <div><div class="cp-stat-value">{{ pending_appointments }}</div><div class="cp-stat-label">Pending confirmation</div></div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="cp-stat-card cp-animate-in delay-3">
+            <div class="cp-stat-icon cp-icon-bg-danger"><i class="bi bi-truck-front"></i></div>
+            <div><div class="cp-stat-value">{{ active_ambulance_requests }}</div><div class="cp-stat-label">Active ambulance calls</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="cp-stat-card">
+            <div class="cp-stat-icon cp-icon-bg-success"><i class="bi bi-person-badge"></i></div>
+            <div><div class="cp-stat-value">{{ total_doctors }}</div><div class="cp-stat-label">Active doctors</div></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="cp-stat-card">
+            <div class="cp-stat-icon cp-icon-bg-primary"><i class="bi bi-diagram-3"></i></div>
+            <div><div class="cp-stat-value">{{ total_departments }}</div><div class="cp-stat-label">Departments</div></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="cp-stat-card">
+            <div class="cp-stat-icon cp-icon-bg-warning"><i class="bi bi-star-fill"></i></div>
+            <div><div class="cp-stat-value">{{ average_rating }}/5</div><div class="cp-stat-label">Avg. patient rating</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-7">
+        <div class="cp-card cp-card-body">
+            <h6 class="mb-3">Appointments — last 7 days</h6>
+            <canvas id="weeklyChart" height="220"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="cp-card cp-card-body">
+            <h6 class="mb-3">Appointments by status</h6>
+            <canvas id="statusChart" height="220"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="cp-card cp-card-body">
+            <h6 class="mb-3">Bookings by department</h6>
+            <canvas id="departmentChart" height="240"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="cp-card cp-card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0">Recent appointments</h6>
+                <a href="{% url 'appointments:list' %}" class="small">View all</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead><tr><th>Patient</th><th>Doctor</th><th>Date</th><th>Status</th></tr></thead>
+                    <tbody>
+                    {% for appt in recent_appointments %}
+                        <tr>
+                            <td>{{ appt.patient.get_full_name|default:appt.patient.username }}</td>
+                            <td>Dr. {{ appt.doctor.full_name }}</td>
+                            <td>{{ appt.scheduled_date|date:"d M" }}, {{ appt.scheduled_time|time:"g:i A" }}</td>
+                            <td><span class="badge {{ appt.status_badge_class }}">{{ appt.get_status_display }}</span></td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4" class="text-center text-muted py-4">No appointments yet.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>
+    const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+    const gridColor = isDark ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.06)';
+    const textColor = isDark ? '#93a1b3' : '#64748b';
+    Chart.defaults.color = textColor;
+    Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+
+    new Chart(document.getElementById('weeklyChart'), {
+        type: 'line',
+        data: {
+            labels: {{ chart_labels|safe }},
+            datasets: [{
+                label: 'Appointments',
+                data: {{ chart_daily_counts|safe }},
+                borderColor: '#2f6690',
+                backgroundColor: 'rgba(47,102,144,.12)',
+                fill: true,
+                tension: 0.35,
+                pointRadius: 3,
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: gridColor } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: {{ chart_status_labels|safe }},
+            datasets: [{
+                data: {{ chart_status_counts|safe }},
+                backgroundColor: ['#f2a541', '#2f6690', '#35b579', '#e85d5d', '#94a3b8'],
+                borderWidth: 0,
+            }]
+        },
+        options: { plugins: { legend: { position: 'bottom' } } }
+    });
+
+    new Chart(document.getElementById('departmentChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ chart_department_labels|safe }},
+            datasets: [{
+                label: 'Bookings',
+                data: {{ chart_department_counts|safe }},
+                backgroundColor: '#29b6a8',
+                borderRadius: 6,
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { beginAtZero: true, grid: { color: gridColor } },
+                y: { grid: { display: false } }
+            }
+        }
+    });
+</script>
+{% endblock %}

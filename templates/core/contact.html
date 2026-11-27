@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Contact{% endblock %}
+{% block content %}
+<section class="cp-section">
+    <div class="container" style="max-width: 720px;">
+        <h1 class="mb-4">Get in touch</h1>
+        <div class="cp-form-card">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="cp-feature-icon"><i class="bi bi-telephone-fill"></i></div>
+                    <h6>Call us</h6>
+                    <p class="text-muted mb-0">{{ SUPPORT_PHONE }}</p>
+                </div>
+                <div class="col-md-6">
+                    <div class="cp-feature-icon"><i class="bi bi-envelope-fill"></i></div>
+                    <h6>Email us</h6>
+                    <p class="text-muted mb-0">{{ SUPPORT_EMAIL }}</p>
+                </div>
+            </div>
+            <hr class="my-4">
+            <p class="text-muted mb-0">
+                For medical emergencies, please use the
+                <a href="{% url 'ambulance:request_create' %}">ambulance request form</a>
+                instead of email — it reaches our dispatch team immediately.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

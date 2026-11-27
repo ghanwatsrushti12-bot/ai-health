@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" data-bs-theme="light" data-server-theme="{% if user.is_authenticated %}{{ user.theme_preference }}{% else %}light{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ SITE_NAME }}{% endblock %} | {{ SITE_NAME }}</title>
+    <meta name="description" content="{{ SITE_TAGLINE }}">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body {% block body_attrs %}{% endblock %}>
+
+<nav class="navbar navbar-expand-lg sticky-top cp-navbar">
+    <div class="container">
+        <a class="navbar-brand cp-brand" href="{% url 'core:landing' %}">
+            <span class="cp-brand-icon"><i class="bi bi-heart-pulse-fill"></i></span>
+            {{ SITE_NAME }}
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="{% url 'doctors:doctor_list' %}">Doctors</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'doctors:department_list' %}">Departments</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'triage:checker' %}">Symptom Checker</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'ambulance:request_create' %}">Ambulance</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'core:about' %}">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'core:contact' %}">Contact</a></li>
+            </ul>
+            <div class="d-flex align-items-center gap-2">
+                <button id="themeToggle" class="btn btn-icon cp-theme-toggle" type="button" title="Toggle theme">
+                    <i class="bi bi-moon-stars-fill"></i>
+                </button>
+                {% if user.is_authenticated %}
+                    <div class="dropdown">
+                        <button class="btn btn-icon position-relative" data-bs-toggle="dropdown">
+                            <i class="bi bi-bell-fill"></i>
+                            {% if unread_notification_count %}
+                                <span class="badge rounded-pill bg-danger cp-notif-badge">{{ unread_notification_count }}</span>
+                            {% endif %}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end cp-dropdown">
+                            {% for note in unread_notifications %}
+                                <li><a class="dropdown-item" href="{% url 'dashboard:mark_notification_read' note.pk %}">{{ note.message }}</a></li>
+                            {% empty %}
+                                <li><span class="dropdown-item-text text-muted">No new notifications</span></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn cp-user-chip dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> {{ user.first_name|default:user.username }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end cp-dropdown">
+                            <li><a class="dropdown-item" href="{% url 'dashboard:home' %}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="bi bi-person me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:settings' %}"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="post" action="{% url 'accounts:logout' %}">
+                                    {% csrf_token %}
+                                    <button class="dropdown-item" type="submit"><i class="bi bi-box-arrow-right me-2"></i>Logout</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="btn btn-outline-secondary btn-sm">Log in</a>
+                    <a href="{% url 'accounts:signup' %}" class="btn cp-btn-primary btn-sm">Sign up</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main>
+    <div class="container mt-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert cp-alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="cp-footer mt-5">
+    <div class="container py-5">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <a class="cp-brand text-white" href="{% url 'core:landing' %}">
+                    <span class="cp-brand-icon"><i class="bi bi-heart-pulse-fill"></i></span>{{ SITE_NAME }}
+                </a>
+                <p class="text-white-50 mt-3">{{ SITE_TAGLINE }} Book appointments, check symptoms, and reach emergency care from one modern dashboard.</p>
+            </div>
+            <div class="col-6 col-lg-2">
+                <h6 class="text-white mb-3">Platform</h6>
+                <ul class="list-unstyled cp-footer-links">
+                    <li><a href="{% url 'doctors:doctor_list' %}">Doctors</a></li>
+                    <li><a href="{% url 'doctors:department_list' %}">Departments</a></li>
+                    <li><a href="{% url 'triage:checker' %}">Symptom Checker</a></li>
+                    <li><a href="{% url 'ambulance:request_create' %}">Ambulance</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-lg-2">
+                <h6 class="text-white mb-3">Company</h6>
+                <ul class="list-unstyled cp-footer-links">
+                    <li><a href="{% url 'core:about' %}">About</a></li>
+                    <li><a href="{% url 'core:contact' %}">Contact</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-4">
+                <h6 class="text-white mb-3">Emergency Contact</h6>
+                <p class="text-white-50 mb-1"><i class="bi bi-telephone-fill me-2"></i>{{ SUPPORT_PHONE }}</p>
+                <p class="text-white-50"><i class="bi bi-envelope-fill me-2"></i>{{ SUPPORT_EMAIL }}</p>
+            </div>
+        </div>
+        <hr class="border-secondary mt-4">
+        <p class="text-white-50 mb-0 small">&copy; {% now "Y" %} {{ SITE_NAME }}. Built for demonstration purposes as a portfolio project.</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/theme.js' %}"></script>
+<script src="{% static 'js/app.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

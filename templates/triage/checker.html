@@ -1,0 +1,78 @@
+{% extends "dashboard/_dashboard_base.html" %}
+{% block page_title %}Symptom Checker{% endblock %}
+{% block page_subtitle %}<p class="text-muted mb-0">Select what you're experiencing for an explainable, non-diagnostic assessment.</p>{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="cp-card cp-card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="cp-symptom-grid mb-4">
+                    {% for checkbox in form.symptoms %}
+                        <label class="cp-symptom-chip">
+                            {{ checkbox.tag }}
+                            <span>{{ checkbox.choice_label }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+                {% for error in form.symptoms.errors %}
+                    <div class="alert alert-danger py-2 small">{{ error }}</div>
+                {% endfor %}
+                <button type="submit" class="btn cp-btn-primary px-4"><i class="bi bi-search-heart me-2"></i>Check symptoms</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        {% if submitted %}
+        <div class="cp-card cp-card-body">
+            <h6 class="mb-3">Assessment result</h6>
+            {% if result.condition %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0">{{ result.condition.name }}</h5>
+                    <span class="badge cp-icon-bg-{% if result.condition.severity == 'emergency' %}danger{% elif result.condition.severity == 'high' %}warning{% else %}accent{% endif %}">
+                        {{ result.condition.get_severity_display }}
+                    </span>
+                </div>
+                <div class="progress mb-3" style="height: 8px;">
+                    <div class="progress-bar cp-btn-primary" style="width: {{ result.confidence }}%;"></div>
+                </div>
+                <p class="text-muted small mb-2">Confidence: {{ result.confidence }}% based on {{ result.matched_symptoms|length }} matched symptom(s): {{ result.matched_symptoms|join:", " }}</p>
+                <p class="text-muted small">{{ result.condition.description }}</p>
+                {% if result.condition.self_care_advice %}
+                <p class="small"><strong>Self-care:</strong> {{ result.condition.self_care_advice }}</p>
+                {% endif %}
+                {% if result.condition.recommended_department %}
+                <a href="{{ result.condition.recommended_department.get_absolute_url }}" class="btn cp-btn-primary btn-sm w-100 mt-2">
+                    See {{ result.condition.recommended_department.name }} specialists
+                </a>
+                {% endif %}
+                {% if result.alternatives %}
+                <hr>
+                <p class="small text-muted mb-1">Other possibilities:</p>
+                <ul class="small text-muted">
+                    {% for alt, confidence in result.alternatives %}
+                        <li>{{ alt.name }} ({{ confidence }}%)</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            {% else %}
+                <div class="cp-empty-state">
+                    <i class="bi bi-question-circle"></i>
+                    We couldn't confidently match your symptoms to a known condition.
+                    Please consult a doctor for a proper diagnosis.
+                </div>
+            {% endif %}
+            <div class="alert alert-warning small mt-3 mb-0">
+                <i class="bi bi-info-circle me-1"></i>This tool is informational only and does not replace professional medical advice.
+            </div>
+        </div>
+        {% else %}
+        <div class="cp-empty-state">
+            <i class="bi bi-clipboard2-pulse"></i>
+            Select your symptoms and submit to see a transparent, explainable assessment.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

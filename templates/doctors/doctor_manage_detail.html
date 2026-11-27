@@ -1,0 +1,53 @@
+{% extends "dashboard/_dashboard_base.html" %}
+{% block page_title %}Dr. {{ doctor.full_name }}{% endblock %}
+{% block page_actions %}
+<a href="{% url 'doctors:doctor_update' doctor.pk %}" class="btn cp-btn-outline"><i class="bi bi-pencil me-1"></i>Edit</a>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="cp-card cp-card-body">
+            <h6 class="mb-3">Profile</h6>
+            <ul class="list-unstyled small text-muted mb-0">
+                <li class="mb-2"><strong>Department:</strong> {{ doctor.department.name }}</li>
+                <li class="mb-2"><strong>Designation:</strong> {{ doctor.designation }}</li>
+                <li class="mb-2"><strong>Qualifications:</strong> {{ doctor.qualifications }}</li>
+                <li class="mb-2"><strong>Experience:</strong> {{ doctor.experience_years }} years</li>
+                <li class="mb-2"><strong>Fee:</strong> &#8377;{{ doctor.consultation_fee }}</li>
+                <li><strong>Status:</strong> {% if doctor.is_active %}Active{% else %}Inactive{% endif %}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="cp-card cp-card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0">Weekly Availability</h6>
+                <a href="{% url 'doctors:availability_create' doctor.pk %}" class="btn btn-sm cp-btn-primary"><i class="bi bi-plus-lg"></i> Add slot</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead><tr><th>Day</th><th>Hours</th><th>Slot</th><th></th></tr></thead>
+                    <tbody>
+                        {% for slot in doctor.availability_slots.all %}
+                        <tr>
+                            <td>{{ slot.get_weekday_display }}</td>
+                            <td>{{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}</td>
+                            <td>{{ slot.slot_minutes }} min</td>
+                            <td class="text-end">
+                                <form method="post" action="{% url 'doctors:availability_delete' slot.pk %}" onsubmit="return confirm('Remove this slot?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4"><div class="cp-empty-state py-3"><i class="bi bi-calendar-x"></i>No availability configured.</div></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

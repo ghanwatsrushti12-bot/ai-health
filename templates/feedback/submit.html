@@ -1,0 +1,11 @@
+{% extends "dashboard/_dashboard_base.html" %}
+{% block page_title %}Share Feedback{% endblock %}
+{% block dashboard_content %}
+<div class="cp-form-card" style="max-width: 560px;">
+    <form method="post">
+        {% csrf_token %}
+        {% include "includes/_form.html" with form=form %}
+        <button type="submit" class="btn cp-btn-primary px-4">Submit feedback</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}About{% endblock %}
+{% block content %}
+<section class="cp-section">
+    <div class="container" style="max-width: 820px;">
+        <h1 class="mb-4">About {{ SITE_NAME }}</h1>
+        <p class="text-muted">
+            {{ SITE_NAME }} is a modular hospital front-desk platform built to demonstrate a
+            production-grade Django architecture: role-based dashboards, a real-time
+            appointment scheduler, an explainable symptom triage tool, ambulance dispatch
+            tracking, and staff analytics — all in one modern interface.
+        </p>
+        <p class="text-muted">
+            This project is organised as a set of focused Django apps
+            (<code>accounts</code>, <code>doctors</code>, <code>appointments</code>,
+            <code>triage</code>, <code>ambulance</code>, <code>feedback</code>,
+            <code>dashboard</code>, <code>core</code>) that each own a single
+            responsibility, communicate through well-defined foreign keys, and can be
+            extended independently.
+        </p>
+        <div class="row g-4 mt-4">
+            <div class="col-md-4">
+                <div class="cp-card cp-card-body h-100">
+                    <div class="cp-feature-icon"><i class="bi bi-diagram-3"></i></div>
+                    <h5>Modular by design</h5>
+                    <p class="text-muted small mb-0">Every domain is its own Django app with its own models, forms, and templates.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="cp-card cp-card-body h-100">
+                    <div class="cp-feature-icon"><i class="bi bi-shield-lock"></i></div>
+                    <h5>Role-aware access</h5>
+                    <p class="text-muted small mb-0">Patients, doctors, and staff each get a tailored dashboard and permission set.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="cp-card cp-card-body h-100">
+                    <div class="cp-feature-icon"><i class="bi bi-rocket-takeoff"></i></div>
+                    <h5>Deployment ready</h5>
+                    <p class="text-muted small mb-0">Gunicorn, WhiteNoise, and environment-driven settings out of the box.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

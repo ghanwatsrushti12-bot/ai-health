@@ -1,0 +1,56 @@
+{% extends "dashboard/_dashboard_base.html" %}
+{% block page_title %}Patient Feedback{% endblock %}
+{% block dashboard_content %}
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="cp-stat-card">
+            <div class="cp-stat-icon cp-icon-bg-warning"><i class="bi bi-star-fill"></i></div>
+            <div><div class="cp-stat-value">{{ average_rating }}/5</div><div class="cp-stat-label">Average rating</div></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="cp-stat-card">
+            <div class="cp-stat-icon cp-icon-bg-accent"><i class="bi bi-chat-square-text"></i></div>
+            <div><div class="cp-stat-value">{{ total_feedback }}</div><div class="cp-stat-label">Total responses</div></div>
+        </div>
+    </div>
+</div>
+
+<form method="get" class="cp-card cp-card-body mb-4">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label small fw-semibold">Category</label>
+            <select name="category" class="form-select">
+                <option value="">All categories</option>
+                {% for value, label in category_choices %}
+                    <option value="{{ value }}" {% if request.GET.category == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2"><button type="submit" class="btn cp-btn-primary w-100">Filter</button></div>
+    </div>
+</form>
+
+<div class="cp-table-card">
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>Patient</th><th>Category</th><th>Doctor</th><th>Rating</th><th>Message</th><th>Date</th></tr></thead>
+            <tbody>
+                {% for item in feedback_entries %}
+                <tr>
+                    <td>{{ item.author.get_full_name|default:"Anonymous" }}</td>
+                    <td>{{ item.get_category_display }}</td>
+                    <td>{{ item.doctor.full_name|default:"-" }}</td>
+                    <td>{{ item.rating }}/5</td>
+                    <td class="small">{{ item.message|truncatewords:12 }}</td>
+                    <td class="small">{{ item.created_at|date:"d M Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6"><div class="cp-empty-state"><i class="bi bi-chat-square-heart"></i>No feedback submitted yet.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% include "includes/_pagination.html" %}
+{% endblock %}

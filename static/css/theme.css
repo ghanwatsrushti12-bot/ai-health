@@ -1,0 +1,90 @@
+/*
+  CarePulse design tokens.
+  All colors flow through CSS custom properties so the dark-mode toggle
+  in theme.js can flip the entire palette by swapping one attribute
+  (`data-bs-theme`) on <html>, instead of duplicating rules per component.
+*/
+
+:root {
+    --cp-primary: #2f6690;
+    --cp-primary-dark: #1d4e70;
+    --cp-accent: #29b6a8;
+    --cp-accent-soft: #e4f7f4;
+    --cp-danger: #e85d5d;
+    --cp-warning: #f2a541;
+    --cp-success: #35b579;
+
+    --cp-bg: #f6f8fb;
+    --cp-surface: #ffffff;
+    --cp-surface-alt: #eef2f7;
+    --cp-border: #e2e8f0;
+    --cp-text: #1f2937;
+    --cp-text-muted: #64748b;
+    --cp-sidebar-bg: #101c2c;
+    --cp-sidebar-text: #b9c6d6;
+    --cp-sidebar-active: #1c3350;
+
+    --cp-radius-sm: 8px;
+    --cp-radius-md: 14px;
+    --cp-radius-lg: 22px;
+    --cp-shadow-sm: 0 2px 8px rgba(16, 28, 44, 0.06);
+    --cp-shadow-md: 0 12px 30px rgba(16, 28, 44, 0.10);
+    --cp-transition: all 0.2s ease-in-out;
+}
+
+[data-bs-theme="dark"] {
+    --cp-bg: #0f1620;
+    --cp-surface: #161f2c;
+    --cp-surface-alt: #1c2634;
+    --cp-border: #263140;
+    --cp-text: #e5eaf1;
+    --cp-text-muted: #93a1b3;
+    --cp-sidebar-bg: #0a121c;
+    --cp-sidebar-text: #8fa1b8;
+    --cp-sidebar-active: #1c2f45;
+    --cp-accent-soft: #12312d;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+    background-color: var(--cp-bg);
+    color: var(--cp-text);
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+a {
+    color: var(--cp-primary);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--cp-primary-dark);
+}
+
+::selection {
+    background: var(--cp-accent);
+    color: #fff;
+}
+
+/* Scrollbar polish */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--cp-border);
+    border-radius: 10px;
+}

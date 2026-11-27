@@ -1,0 +1,75 @@
+{% extends "dashboard/_dashboard_base.html" %}
+{% block page_title %}
+    {% if user.is_staff_role or user.is_superuser %}All Appointments{% elif user.is_doctor_role %}My Schedule{% else %}My Appointments{% endif %}
+{% endblock %}
+{% block page_actions %}
+    {% if not user.is_doctor_role and not user.is_staff_role %}
+    <a href="{% url 'appointments:book' %}" class="btn cp-btn-primary"><i class="bi bi-plus-lg me-1"></i>Book new</a>
+    {% endif %}
+{% endblock %}
+
+{% block dashboard_content %}
+<form method="get" class="cp-card cp-card-body mb-4">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label small fw-semibold">Search</label>
+            {{ form.q }}
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold">Status</label>
+            {{ form.status }}
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small fw-semibold">From</label>
+            {{ form.date_from }}
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small fw-semibold">To</label>
+            {{ form.date_to }}
+        </div>
+        <div class="col-md-1">
+            <button type="submit" class="btn cp-btn-primary w-100"><i class="bi bi-funnel"></i></button>
+        </div>
+    </div>
+</form>
+
+<div class="cp-table-card">
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    {% if user.is_staff_role or user.is_superuser or user.is_doctor_role %}<th>Patient</th>{% endif %}
+                    {% if not user.is_doctor_role %}<th>Doctor</th>{% endif %}
+                    <th>Department</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appt in appointments %}
+                <tr>
+                    {% if user.is_staff_role or user.is_superuser or user.is_doctor_role %}
+                    <td>{{ appt.patient.get_full_name|default:appt.patient.username }}</td>
+                    {% endif %}
+                    {% if not user.is_doctor_role %}
+                    <td>Dr. {{ appt.doctor.full_name }}</td>
+                    {% endif %}
+                    <td>{{ appt.department.name }}</td>
+                    <td>{{ appt.scheduled_date|date:"d M Y" }}</td>
+                    <td>{{ appt.scheduled_time|time:"g:i A" }}</td>
+                    <td><span class="badge {{ appt.status_badge_class }}">{{ appt.get_status_display }}</span></td>
+                    <td class="text-end">
+                        <a href="{% url 'appointments:detail' appt.pk %}" class="btn btn-sm cp-btn-outline">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6"><div class="cp-empty-state"><i class="bi bi-calendar-x"></i>No appointments found.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% include "includes/_pagination.html" %}
+{% endblock %}

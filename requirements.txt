@@ -1,0 +1,18 @@
+# Core framework
+Django>=5.1,<5.2
+
+# Environment-based settings (.env parsing, DATABASE_URL, etc.)
+django-environ>=0.11,<1.0
+
+# Static file serving in production (no separate CDN/nginx config needed)
+whitenoise>=6.7,<7.0
+
+# ImageField support (doctor photos, avatars)
+Pillow>=10.4,<11.0
+
+# Production WSGI server
+gunicorn>=22.0,<23.0
+
+# PostgreSQL driver for production deployments (Render / Railway).
+# Not required for local development, which defaults to SQLite.
+psycopg[binary]>=3.2,<4.0

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Request Ambulance{% endblock %}
+{% block content %}
+<section class="cp-section">
+    <div class="container" style="max-width: 640px;">
+        <div class="alert alert-danger d-flex align-items-center gap-2 mb-4">
+            <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+            <div>If this is a life-threatening emergency, please also call {{ SUPPORT_PHONE }} directly.</div>
+        </div>
+        <div class="cp-form-card">
+            <h1 class="h4 mb-4"><i class="bi bi-truck me-2"></i>Request an Ambulance</h1>
+            <form method="post">
+                {% csrf_token %}
+                {% include "includes/_form.html" with form=form %}
+                <button type="submit" class="btn btn-danger w-100 fw-semibold">
+                    <i class="bi bi-send-fill me-2"></i>Submit request
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

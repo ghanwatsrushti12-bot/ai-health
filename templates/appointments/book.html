@@ -1,0 +1,40 @@
+{% extends "dashboard/_dashboard_base.html" %}
+{% block page_title %}Book an Appointment{% endblock %}
+{% block page_subtitle %}<p class="text-muted mb-0">Pick a department, doctor, and an open time slot.</p>{% endblock %}
+
+{% block body_attrs %}data-slots-url="{% url 'appointments:available_slots' %}"{% endblock %}
+
+{% block dashboard_content %}
+<div class="cp-form-card" style="max-width: 640px;">
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Department</label>
+            {{ form.department }}
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Doctor</label>
+            {{ form.doctor }}
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Date</label>
+                {{ form.scheduled_date }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-semibold">Time slot</label>
+                {{ form.scheduled_time }}
+                <div class="form-text">Slots update automatically once you pick a doctor and date.</div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Reason for visit</label>
+            {{ form.reason }}
+        </div>
+        {% for error in form.non_field_errors %}
+            <div class="alert alert-danger py-2 small">{{ error }}</div>
+        {% endfor %}
+        <button type="submit" class="btn cp-btn-primary px-4">Confirm booking</button>
+    </form>
+</div>
+{% endblock %}

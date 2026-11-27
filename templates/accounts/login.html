@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+<section class="cp-section">
+    <div class="container" style="max-width: 460px;">
+        <div class="cp-form-card cp-animate-in">
+            <div class="text-center mb-4">
+                <div class="cp-brand-icon mx-auto mb-3" style="width:56px;height:56px;font-size:1.5rem;">
+                    <i class="bi bi-heart-pulse-fill"></i>
+                </div>
+                <h1 class="h4">Welcome back</h1>
+                <p class="text-muted small">Log in to manage your appointments and care.</p>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" for="{{ form.username.id_for_label }}">Username</label>
+                    <input type="text" name="username" class="form-control" id="{{ form.username.id_for_label }}" autofocus required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" for="{{ form.password.id_for_label }}">Password</label>
+                    <input type="password" name="password" class="form-control" id="{{ form.password.id_for_label }}" required>
+                </div>
+                {% if form.errors %}
+                    <div class="alert alert-danger py-2 small">Please enter a correct username and password.</div>
+                {% endif %}
+                <button type="submit" class="btn cp-btn-primary w-100 mb-3">Log in</button>
+                <div class="d-flex justify-content-between small">
+                    <a href="{% url 'accounts:password_reset' %}">Forgot password?</a>
+                    <a href="{% url 'accounts:signup' %}">Create an account</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

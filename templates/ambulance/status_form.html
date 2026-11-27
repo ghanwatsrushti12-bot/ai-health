@@ -1,0 +1,12 @@
+{% extends "dashboard/_dashboard_base.html" %}
+{% block page_title %}Update Request - {{ object.contact_name }}{% endblock %}
+{% block dashboard_content %}
+<div class="cp-form-card" style="max-width: 520px;">
+    <form method="post">
+        {% csrf_token %}
+        {% include "includes/_form.html" with form=form %}
+        <button type="submit" class="btn cp-btn-primary px-4">Save</button>
+        <a href="{% url 'ambulance:request_list' %}" class="btn cp-btn-outline px-4">Back</a>
+    </form>
+</div>
+{% endblock %}

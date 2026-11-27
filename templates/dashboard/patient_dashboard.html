@@ -1,0 +1,64 @@
+{% extends "dashboard/_dashboard_base.html" %}
+{% block page_title %}Welcome back, {{ user.first_name|default:user.username }}{% endblock %}
+{% block page_subtitle %}<p class="text-muted mb-0">Here's a snapshot of your care.</p>{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="cp-stat-card cp-animate-in">
+            <div class="cp-stat-icon cp-icon-bg-primary"><i class="bi bi-calendar2-check"></i></div>
+            <div><div class="cp-stat-value">{{ appointment_count }}</div><div class="cp-stat-label">Total appointments</div></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="cp-stat-card cp-animate-in delay-1">
+            <div class="cp-stat-icon cp-icon-bg-accent"><i class="bi bi-clipboard2-pulse"></i></div>
+            <div><div class="cp-stat-value">{{ triage_count }}</div><div class="cp-stat-label">Symptom checks</div></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="cp-stat-card cp-animate-in delay-2">
+            <div class="cp-stat-icon cp-icon-bg-danger"><i class="bi bi-truck"></i></div>
+            <div><div class="cp-stat-value">{{ ambulance_count }}</div><div class="cp-stat-label">Ambulance requests</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="cp-card cp-card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0">Upcoming appointments</h6>
+                <a href="{% url 'appointments:list' %}" class="small">View all</a>
+            </div>
+            {% for appt in upcoming_appointments %}
+            <div class="d-flex justify-content-between align-items-center py-2 {% if not forloop.last %}border-bottom{% endif %}">
+                <div>
+                    <div class="fw-semibold">Dr. {{ appt.doctor.full_name }}</div>
+                    <div class="text-muted small">{{ appt.department.name }}</div>
+                </div>
+                <div class="text-end">
+                    <div class="small">{{ appt.scheduled_date|date:"d M" }}, {{ appt.scheduled_time|time:"g:i A" }}</div>
+                    <span class="badge {{ appt.status_badge_class }}">{{ appt.get_status_display }}</span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="cp-empty-state"><i class="bi bi-calendar-plus"></i>No upcoming appointments. <a href="{% url 'appointments:book' %}">Book one now</a>.</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="cp-card cp-card-body">
+            <h6 class="mb-3">Recent symptom checks</h6>
+            {% for assessment in recent_triage %}
+            <div class="py-2 {% if not forloop.last %}border-bottom{% endif %}">
+                <div class="fw-semibold small">{{ assessment.predicted_condition.name|default:"Unclear result" }}</div>
+                <div class="text-muted small">{{ assessment.created_at|date:"d M Y" }} &middot; {{ assessment.confidence_score }}% confidence</div>
+            </div>
+            {% empty %}
+            <div class="cp-empty-state"><i class="bi bi-clipboard2-pulse"></i>No symptom checks yet. <a href="{% url 'triage:checker' %}">Try it now</a>.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

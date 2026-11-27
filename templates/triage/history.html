@@ -1,0 +1,24 @@
+{% extends "dashboard/_dashboard_base.html" %}
+{% block page_title %}Triage History{% endblock %}
+{% block dashboard_content %}
+<div class="cp-table-card">
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>Date</th><th>Symptoms reported</th><th>Predicted condition</th><th>Confidence</th></tr></thead>
+            <tbody>
+                {% for assessment in assessments %}
+                <tr>
+                    <td>{{ assessment.created_at|date:"d M Y, g:i A" }}</td>
+                    <td>{% for symptom in assessment.reported_symptoms.all %}{{ symptom.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+                    <td>{{ assessment.predicted_condition.name|default:"Unclear" }}</td>
+                    <td>{{ assessment.confidence_score }}%</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4"><div class="cp-empty-state"><i class="bi bi-clock-history"></i>No triage history yet.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% include "includes/_pagination.html" %}
+{% endblock %}

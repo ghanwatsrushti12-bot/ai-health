@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Dr. {{ doctor.full_name }}{% endblock %}
+{% block content %}
+<section class="cp-section">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="cp-card cp-doctor-card">
+                    {% if doctor.photo %}
+                        <img src="{{ doctor.photo.url }}" class="cp-doctor-photo" style="height:280px;" alt="Dr. {{ doctor.full_name }}">
+                    {% else %}
+                        <div class="cp-doctor-photo-placeholder" style="height:280px;"><i class="bi bi-person-badge" style="font-size:4rem;"></i></div>
+                    {% endif %}
+                    <div class="cp-card-body">
+                        <h4 class="mb-1">Dr. {{ doctor.full_name }}</h4>
+                        <p class="text-muted mb-2">{{ doctor.designation }}</p>
+                        <span class="badge cp-icon-bg-primary mb-3">{{ doctor.department.name }}</span>
+                        <ul class="list-unstyled small text-muted">
+                            <li class="mb-2"><i class="bi bi-mortarboard me-2"></i>{{ doctor.qualifications }}</li>
+                            <li class="mb-2"><i class="bi bi-award me-2"></i>{{ doctor.experience_years }} years experience</li>
+                            <li class="mb-2"><i class="bi bi-translate me-2"></i>{{ doctor.languages_spoken }}</li>
+                            <li class="mb-2"><i class="bi bi-currency-rupee me-2"></i>&#8377;{{ doctor.consultation_fee }} consultation fee</li>
+                            {% if doctor.accepts_walk_ins %}
+                            <li class="text-success"><i class="bi bi-check-circle me-2"></i>Accepts walk-ins</li>
+                            {% endif %}
+                        </ul>
+                        <a href="{% url 'appointments:book' %}?doctor={{ doctor.pk }}" class="btn cp-btn-primary w-100">
+                            <i class="bi bi-calendar-plus me-2"></i>Book appointment
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="cp-card cp-card-body mb-4">
+                    <h5 class="mb-3">About Dr. {{ doctor.full_name }}</h5>
+                    <p class="text-muted">{{ doctor.bio|default:"No additional biography provided yet." }}</p>
+                </div>
+                <div class="cp-card cp-card-body">
+                    <h5 class="mb-3">Weekly Availability</h5>
+                    {% if doctor.availability_slots.all %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead><tr><th>Day</th><th>Hours</th><th>Slot length</th></tr></thead>
+                            <tbody>
+                                {% for slot in doctor.availability_slots.all %}
+                                <tr>
+                                    <td>{{ slot.get_weekday_display }}</td>
+                                    <td>{{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}</td>
+                                    <td>{{ slot.slot_minutes }} min</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="cp-empty-state"><i class="bi bi-calendar-x"></i>Availability has not been configured yet.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

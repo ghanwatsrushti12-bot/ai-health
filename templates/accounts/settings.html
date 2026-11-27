@@ -1,0 +1,35 @@
+{% extends "dashboard/_dashboard_base.html" %}
+{% block page_title %}Settings{% endblock %}
+{% block page_subtitle %}<p class="text-muted mb-0">Preferences and account security.</p>{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="cp-card cp-card-body">
+            <h5 class="mb-3"><i class="bi bi-palette me-2"></i>Appearance</h5>
+            <form method="post">
+                {% csrf_token %}
+                {% include "includes/_form.html" with form=theme_form %}
+                <button type="submit" class="btn cp-btn-primary px-4">Save preference</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="cp-card cp-card-body">
+            <h5 class="mb-3"><i class="bi bi-shield-lock me-2"></i>Security</h5>
+            <p class="text-muted small">Change your password regularly to keep your account secure.</p>
+            <a href="{% url 'accounts:password_change' %}" class="btn cp-btn-outline px-4">Change password</a>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="cp-card cp-card-body">
+            <h5 class="mb-3"><i class="bi bi-info-circle me-2"></i>Account details</h5>
+            <table class="table mb-0">
+                <tr><th style="width:200px;">Username</th><td>{{ user.username }}</td></tr>
+                <tr><th>Role</th><td>{{ user.get_role_display }}</td></tr>
+                <tr><th>Verified</th><td>{% if user.is_verified %}<span class="text-success"><i class="bi bi-check-circle-fill"></i> Yes</span>{% else %}<span class="text-muted">Not yet verified</span>{% endif %}</td></tr>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

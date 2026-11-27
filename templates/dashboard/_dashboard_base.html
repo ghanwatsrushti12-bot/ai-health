@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="cp-app-shell">
+    <aside class="cp-sidebar" id="cpSidebar">
+        <div class="cp-sidebar-section">
+            <span class="cp-sidebar-label">Menu</span>
+            <a href="{% url 'dashboard:home' %}" class="cp-sidebar-link {% if request.resolver_match.namespace == 'dashboard' %}active{% endif %}">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+            <a href="{% url 'appointments:list' %}" class="cp-sidebar-link {% if request.resolver_match.namespace == 'appointments' %}active{% endif %}">
+                <i class="bi bi-calendar2-check"></i> Appointments
+            </a>
+            {% if not user.is_doctor_role %}
+            <a href="{% url 'appointments:book' %}" class="cp-sidebar-link">
+                <i class="bi bi-calendar-plus"></i> Book Appointment
+            </a>
+            {% endif %}
+            <a href="{% url 'triage:checker' %}" class="cp-sidebar-link">
+                <i class="bi bi-clipboard2-pulse"></i> Symptom Checker
+            </a>
+            {% if not user.is_staff_role and not user.is_doctor_role %}
+            <a href="{% url 'triage:history' %}" class="cp-sidebar-link">
+                <i class="bi bi-clock-history"></i> Triage History
+            </a>
+            <a href="{% url 'ambulance:request_create' %}" class="cp-sidebar-link">
+                <i class="bi bi-truck"></i> Request Ambulance
+            </a>
+            <a href="{% url 'feedback:submit' %}" class="cp-sidebar-link">
+                <i class="bi bi-chat-square-heart"></i> Give Feedback
+            </a>
+            {% endif %}
+        </div>
+
+        {% if user.is_staff_role or user.is_superuser %}
+        <div class="cp-sidebar-section">
+            <span class="cp-sidebar-label">Administration</span>
+            <a href="{% url 'doctors:manage_list' %}" class="cp-sidebar-link {% if request.resolver_match.namespace == 'doctors' %}active{% endif %}">
+                <i class="bi bi-person-badge"></i> Manage Doctors
+            </a>
+            <a href="{% url 'ambulance:request_list' %}" class="cp-sidebar-link {% if request.resolver_match.namespace == 'ambulance' %}active{% endif %}">
+                <i class="bi bi-truck-front"></i> Ambulance Requests
+            </a>
+            <a href="{% url 'feedback:manage_list' %}" class="cp-sidebar-link {% if request.resolver_match.namespace == 'feedback' %}active{% endif %}">
+                <i class="bi bi-star-half"></i> Feedback
+            </a>
+            <a href="/admin/" class="cp-sidebar-link">
+                <i class="bi bi-shield-lock"></i> Django Admin
+            </a>
+        </div>
+        {% endif %}
+
+        <div class="cp-sidebar-section">
+            <span class="cp-sidebar-label">Account</span>
+            <a href="{% url 'accounts:profile' %}" class="cp-sidebar-link {% if request.resolver_match.namespace == 'accounts' and request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                <i class="bi bi-person"></i> Profile
+            </a>
+            <a href="{% url 'accounts:settings' %}" class="cp-sidebar-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+                <i class="bi bi-gear"></i> Settings
+            </a>
+        </div>
+    </aside>
+
+    <button class="cp-sidebar-toggle d-lg-none" id="cpSidebarToggle" type="button">
+        <i class="bi bi-list"></i> Menu
+    </button>
+
+    <section class="cp-app-content">
+        <div class="cp-page-header">
+            <div>
+                <h1 class="cp-page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+                {% block page_subtitle %}{% endblock %}
+            </div>
+            <div class="cp-page-actions">{% block page_actions %}{% endblock %}</div>
+        </div>
+        {% block dashboard_content %}{% endblock %}
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('cpSidebarToggle')?.addEventListener('click', function () {
+        document.getElementById('cpSidebar').classList.toggle('cp-sidebar-open');
+    });
+</script>
+{% endblock %}

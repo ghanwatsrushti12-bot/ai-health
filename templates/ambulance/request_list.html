@@ -1,0 +1,52 @@
+{% extends "dashboard/_dashboard_base.html" %}
+{% block page_title %}Ambulance Requests{% endblock %}
+{% block dashboard_content %}
+<form method="get" class="cp-card cp-card-body mb-4">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label small fw-semibold">Status</label>
+            <select name="status" class="form-select">
+                <option value="">All</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label small fw-semibold">Priority</label>
+            <select name="priority" class="form-select">
+                <option value="">All</option>
+                {% for value, label in priority_choices %}
+                    <option value="{{ value }}" {% if request.GET.priority == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn cp-btn-primary w-100">Filter</button>
+        </div>
+    </div>
+</form>
+
+<div class="cp-table-card">
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>Contact</th><th>Address</th><th>Priority</th><th>Status</th><th>Requested</th><th></th></tr></thead>
+            <tbody>
+                {% for req in requests %}
+                <tr>
+                    <td>{{ req.contact_name }}<br><span class="text-muted small">{{ req.contact_phone }}</span></td>
+                    <td class="small">{{ req.pickup_address|truncatewords:8 }}</td>
+                    <td><span class="badge {{ req.priority_badge_class }}">{{ req.get_priority_display }}</span></td>
+                    <td>{{ req.get_status_display }}</td>
+                    <td class="small">{{ req.created_at|timesince }} ago</td>
+                    <td class="text-end"><a href="{% url 'ambulance:request_update' req.pk %}" class="btn btn-sm cp-btn-outline">Update</a></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6"><div class="cp-empty-state"><i class="bi bi-truck"></i>No ambulance requests found.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% include "includes/_pagination.html" %}
+{% endblock %}

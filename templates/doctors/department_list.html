@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Departments{% endblock %}
+{% block content %}
+<section class="cp-section">
+    <div class="container">
+        <div class="mb-5 text-center">
+            <h1>Our Departments</h1>
+            <p class="text-muted">Specialised care teams across every major discipline.</p>
+        </div>
+        <div class="row g-4">
+            {% for department in departments %}
+            <div class="col-md-4 col-lg-3">
+                <a href="{{ department.get_absolute_url }}" class="cp-card d-block p-4 h-100 text-decoration-none">
+                    <div class="cp-dept-icon mb-3"><i class="bi {{ department.icon }}"></i></div>
+                    <h5 style="color: var(--cp-text);">{{ department.name }}</h5>
+                    <p class="text-muted small">{{ department.description|truncatewords:16 }}</p>
+                    <span class="badge cp-icon-bg-accent">{{ department.doctor_count }} doctors</span>
+                </a>
+            </div>
+            {% empty %}
+            <div class="cp-empty-state"><i class="bi bi-hospital"></i>No departments configured yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
